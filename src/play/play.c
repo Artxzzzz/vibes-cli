@@ -3,6 +3,7 @@
 #include "utils/resolve/resolve.h"
 #include "utils/wait/wait.h"
 #include "utils/format/format.h"
+#include "utils/progress/progress.h"
 
 #include "utils/playInc.h"
 
@@ -49,14 +50,17 @@ int play(char *musicPath) {
 
 
     #ifdef _WIN32
-        printf("Playing %s... Press any key to exit\n", getFileNameWithoutExt(real));
+        printf("\nPlaying %s... Press any key to exit\n", getFileNameWithoutExt(real));
     #else
-        printf("Playing %s... Press Enter to stop...\n", getFileNameWithoutExt(real));
+        printf("\nPlaying %s... Press Enter to stop...\n", getFileNameWithoutExt(real));
     #endif
 
+    double duration = Mix_MusicDuration(music);
+
+    progressBar(duration, music);
     wait();
 
-
+    stopProgress();
     Mix_FreeMusic(music);
     Mix_CloseAudio();
     SDL_Quit();
