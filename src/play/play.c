@@ -1,5 +1,9 @@
 #include "play.h"
-#include "utils/resolve.h"
+
+#include "utils/resolve/resolve.h"
+#include "utils/wait/wait.h"
+#include "utils/format/format.h"
+
 #include "utils/playInc.h"
 
 int play(char *musicPath) {
@@ -43,9 +47,14 @@ int play(char *musicPath) {
         printf("Technical details: %s\n", Mix_GetError());
     }
 
-    printf("Playing... press ENTER to exit\n");
-    while (getchar() != '\n');
-    getchar();
+
+    #ifdef _WIN32
+        printf("Playing %s... Press any key to exit\n", getFileNameWithoutExt(real));
+    #else
+        printf("Playing %s... Press Enter to stop...\n", getFileNameWithoutExt(real));
+    #endif
+
+    wait();
 
 
     Mix_FreeMusic(music);

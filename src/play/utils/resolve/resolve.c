@@ -1,4 +1,4 @@
-#include "playInc.h"
+#include "../playInc.h"
 
 int resolvePath(char *input, char *output) {
     #ifdef _WIN32
