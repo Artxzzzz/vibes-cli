@@ -50,15 +50,15 @@ int play(char *musicPath) {
 
 
     #ifdef _WIN32
-        printf("\nPlaying %s... Press any key to exit\n", getFileNameWithoutExt(real));
+        printf("\nPlaying %s... Press \"q\" to exit\n", getFileNameWithoutExt(real));
     #else
-        printf("\nPlaying %s... Press Enter to stop...\n", getFileNameWithoutExt(real));
+        printf("\nPlaying %s... Press \"q\" to exit...\n", getFileNameWithoutExt(real));
     #endif
 
     double duration = Mix_MusicDuration(music);
 
     progressBar(duration, music);
-    wait();
+    wait(music);
 
     stopProgress();
     Mix_FreeMusic(music);
