@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <limits.h>
+#include <stdlib.h>
 
 #include "sleep/sleep.h"
 #include "config/config.h"
@@ -9,10 +10,15 @@
 #include "playDirectory/inc.h"
 #include "player/player.h"
 
+#define ISARG(short_opt, long_opt) \
+    (strcmp(argv[arg], "-" short_opt) == 0 || \
+     strcmp(argv[arg], "--" long_opt) == 0)
+
 int main(int argc, char **argv) {
     int tosleep = 1;
     int versionBool = 0;
     int loop = 0;
+    char *musicPath = NULL;
 
     int result = 0;
 
@@ -22,9 +28,16 @@ int main(int argc, char **argv) {
     }
 
     for (int arg = 1; arg < argc; arg++) {
-        if (strcmp(argv[arg], "-v") == 0 || strcmp(argv[arg], "--version") == 0) versionBool = 1;
-        if (strcmp(argv[arg], "-s") == 0 || strcmp(argv[arg], "--sleep") == 0) tosleep = 0;
-        if (strcmp(argv[arg], "-l") == 0 || strcmp(argv[arg], "--loop") == 0) loop = 1;
+        if (ISARG("v", "version")) {versionBool = 1; continue;}
+        if (ISARG("s", "sleep")) {tosleep = 0; continue;}
+        if (ISARG("l", "loop")) {loop = 1; continue;}
+
+        if (argv[arg][0] == '-') {
+            fprintf(stderr, "Error: unknown option: '%s'\n", argv[arg]);
+            return 1;
+        }
+
+        musicPath = argv[arg];
     }
 
     if (versionBool) {
@@ -33,7 +46,7 @@ int main(int argc, char **argv) {
     }
 
     int loopOriginal = loop;
-    char *folder = checkFolder(argv[1]);
+    char *folder = checkFolder(musicPath);
 
     if (folder && loop) loop = 0;
 
@@ -68,7 +81,7 @@ int main(int argc, char **argv) {
     }
 
     else {
-        result = play(p, argv[1]);
+        result = play(p, musicPath);
     }
 
     playerDestroy(p);
