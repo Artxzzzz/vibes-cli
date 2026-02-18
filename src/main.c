@@ -1,3 +1,4 @@
+#define SDL_MAIN_HANDLED
 #include <stdio.h>
 #include <string.h>
 #include <limits.h>
@@ -6,9 +7,11 @@
 #include "config/config.h"
 #include "play/play.h"
 #include "playDirectory/inc.h"
+#include "player/player.h"
 
 int main(int argc, char **argv) {
     int tosleep = 1;
+    int result = 0;
 
     if (argc < 2) {
         printf("Use: vibes <music>\n");
@@ -24,13 +27,14 @@ int main(int argc, char **argv) {
         tosleep = 0;
     }
 
+    Player *p = playerCreate();
+    if (!p) return 1;
     
     char *folder = checkFolder(argv[1]);
 
     if (folder) {
         char files[100][PATH_MAX];
         int total = getAudio(folder, files, 100);
-        int ok = 0;
 
         for (int audio = 0; audio < total; audio++) {
             char path[PATH_MAX * 2];
@@ -41,20 +45,19 @@ int main(int argc, char **argv) {
                 snprintf(path, sizeof(path), "%s/%s", folder, files[audio]);
             #endif
 
-            ok = play(path);
-            if (ok != 0) {
-                printf("Error to play: %s\n", path);
-            }
+            play(p, path);
             
-            if (tosleep) {
-                msleep(.25);
-            }
+            if (tosleep) msleep(.25);
         }
 
-        return 0;
+        result = 0;
+        free(folder);
     }
 
     else {
-        return play(argv[1]);
+        result = play(p, argv[1]);
     }
+
+    playerDestroy(p);
+    return result;
 }

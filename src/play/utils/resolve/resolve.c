@@ -1,4 +1,13 @@
-#include "../playInc.h"
+#include "resolve.h"
+
+#ifdef _WIN32
+    #include <windows.h>
+#else
+    #include <dirent.h>
+#endif
+
+#include <stdio.h>
+#include <string.h>
 
 int resolvePath(char *input, char *output) {
     #ifdef _WIN32
@@ -15,7 +24,8 @@ int resolvePath(char *input, char *output) {
         h = FindFirstFile(pattern, &fd);
 
         if (h != INVALID_HANDLE_VALUE) {
-            strcpy(output, fd.cFileName);
+            snprintf(output, PATH_MAX, "%s", fd.cFileName);
+
             FindClose(h);
             return 1;
         }
@@ -24,20 +34,25 @@ int resolvePath(char *input, char *output) {
 
     #else
         FILE *f = fopen(input, "r");
+
         if (f) {
             fclose(f);
-            strcpy(output, input);
+            snprintf(output, PATH_MAX, "%s", input);
             return 1;
         }
+
 
         DIR *dir = opendir(".");
         struct dirent *ent;
 
         while ((ent = readdir(dir)) != NULL) {
+
             if (strncmp(ent->d_name, input, strlen(input)) == 0 &&
                 ent->d_name[strlen(input)] == '.') {
-                strcpy(output, ent->d_name);
+
+                snprintf(output, PATH_MAX, "%s", ent->d_name);
                 closedir(dir);
+
                 return 1;
             }
         }

@@ -8,14 +8,11 @@ SRC = $(shell find $(SRC_DIR) -name "*.c")
 OBJ = $(patsubst $(SRC_DIR)/%.c,$(BUILD_DIR)/%.o,$(SRC))
 BIN = vibes
 
-# Detecta o sistema
 ifeq ($(OS),Windows_NT)
     BIN := $(BIN).exe
-    # Ajuste do include do SDL2 no Windows/Git Bash (alterar se seu SDL2 estiver em outro lugar)
     CFLAGS += -IC:/SDL2/include
     LDFLAGS += -LC:/SDL2/lib -lmingw32
 else
-    # Linux/WSL
     CFLAGS += -I/usr/include/SDL2
 endif
 

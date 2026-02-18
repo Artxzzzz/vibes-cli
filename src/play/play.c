@@ -1,13 +1,13 @@
+#include <stdio.h>
+#include <limits.h> 
 #include "play.h"
+#include "../player/player.h"
 
 #include "utils/resolve/resolve.h"
-#include "utils/wait/wait.h"
 #include "utils/format/format.h"
-#include "utils/progress/progress.h"
+#include "utils/input/input.h"
 
-#include "utils/playInc.h"
-
-int play(char *musicPath) {
+int play(Player *p, char *musicPath) {
 
     char real[PATH_MAX];
 
@@ -16,54 +16,29 @@ int play(char *musicPath) {
         return 1;
     }
 
-
-    if (SDL_Init(SDL_INIT_AUDIO) < 0) {
-        printf("Failed to initialize audio system.\n");
-        printf("Technical details: %s\n", SDL_GetError());
+    if (!loadPlayer(p, real)) {
+        printf("Load error: %s\n", musicPath);
         return 1;
     }
 
-    if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0) {
-        printf("Could not open audio device.\n");
-        printf("Make sure no other application is using the sound device.\n");
-        printf("Technical details: %s\n", Mix_GetError());
-        SDL_Quit();
-        return 1;
-    }
+    char name[PATH_MAX];
+    getFileNameWithoutExt(real, name);
 
-    Mix_Music* music = Mix_LoadMUS(real);
+    printf("\nPlaying %s... Press \"q\" to exit\n", name);
 
-    if (!music) {
-        printf("Could not load music file.\n");
-        printf("File path: %s\n", musicPath);
-        printf("Make sure the file exists and is a supported format.\n");
-        printf("Technical details: %s\n", Mix_GetError());
-        Mix_CloseAudio();
-        SDL_Quit();
-        return 1;
-    }
+    p->progressThread = SDL_CreateThread(progressThread, "Progress", p);
 
-    if (Mix_PlayMusic(music, 1) < 0) {
-        printf("Failed to play the music.\n");
-        printf("Technical details: %s\n", Mix_GetError());
+    if (!p->progressThread) {
+        printf("Failed to create progress thread\n");
     }
 
 
-    #ifdef _WIN32
-        printf("\nPlaying %s... Press \"q\" to exit\n", getFileNameWithoutExt(real));
-    #else
-        printf("\nPlaying %s... Press \"q\" to exit...\n", getFileNameWithoutExt(real));
-    #endif
+    input(p);
 
-    double duration = Mix_MusicDuration(music);
+    p->running = 0;
+    SDL_WaitThread(p->progressThread, NULL);
 
-    progressBar(duration, music);
-    wait(music);
-
-    stopProgress();
-    Mix_FreeMusic(music);
-    Mix_CloseAudio();
-    SDL_Quit();
+    printf("\n");
 
     return 0;
 }

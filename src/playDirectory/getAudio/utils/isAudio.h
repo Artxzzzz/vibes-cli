@@ -1,6 +1,6 @@
 #ifndef ISAUDIO_H
 #define ISAUDIO_H
 
-int isAudioFile(char *filename);
+int isAudioFile(const char *filename);
 
 #endif

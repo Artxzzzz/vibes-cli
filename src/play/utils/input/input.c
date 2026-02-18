@@ -1,6 +1,5 @@
 #include <stdio.h>
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_mixer.h>
+#include "input.h"
 
 #ifdef _WIN32
     #include <conio.h>
@@ -22,15 +21,14 @@
     }
 #endif
 
-void wait(Mix_Music* music) {
-    int done = 0;
-    int volume = Mix_VolumeMusic(-1);
+void input(Player* p) {
 
     #ifndef _WIN32
         setConio(1); 
     #endif
 
-    while (!done) {
+    while (p->running && !p->quit) {
+
         if (!Mix_PlayingMusic() && !Mix_PausedMusic()) {
             break;
         }
@@ -83,40 +81,43 @@ void wait(Mix_Music* music) {
                 case 'q': case 'Q':
                 
                     Mix_HaltMusic();
-                    done = 1;
-                    printf("\n");
 
+                    p->quit = 1;
+                    p->running = 0;
+
+                    printf("\n");
                     break;
 
                 case ' ':
+                    p->paused = !p->paused;
 
-                    if (Mix_PausedMusic()) Mix_ResumeMusic();
-                    else Mix_PauseMusic();
+                    if (p->paused) Mix_PauseMusic();
+                    else Mix_ResumeMusic();
                     break;
 
                 case 'U':
 
-                    volume = (volume + 8 > 128) ? 128 : volume + 8;
-                    Mix_VolumeMusic(volume);
+                    p->vol = (p->vol + 8 > 128) ? 128 : p->vol + 8;
+                    Mix_VolumeMusic(p->vol);
                     break;
 
                 case 'D':
 
-                    volume = (volume - 8 < 0) ? 0 : volume - 8;
-                    Mix_VolumeMusic(volume);
+                    p->vol = (p->vol - 8 < 0) ? 0 : p->vol - 8;
+                    Mix_VolumeMusic(p->vol);
                     break;
 
                 case 'R':
 
                     {
-                        double pos = Mix_GetMusicPosition(music);
+                        double pos = Mix_GetMusicPosition(p->music);
                         if (pos >= 0) Mix_SetMusicPosition(pos + 5.0);
                     }
                     break;
 
                 case 'L':
                     {
-                        double pos = Mix_GetMusicPosition(music);
+                        double pos = Mix_GetMusicPosition(p->music);
                         if (pos >= 0) {
                             double new_pos = (pos - 5.0 < 0) ? 0 : pos - 5.0;
                             Mix_RewindMusic();
@@ -125,6 +126,10 @@ void wait(Mix_Music* music) {
                     }
                     break;
             }
+        }
+
+        if (!Mix_PlayingMusic() && !Mix_PausedMusic()) {
+            p->running = 0;
         }
 
         SDL_Delay(50);

@@ -2,7 +2,7 @@
 
 #include "isAudio.h"
 
-int isAudioFile(char *filename) {
+int isAudioFile(const char *filename) {
     const char *ext = strrchr(filename, '.');
     if (!ext) return 0;
     return strcmp(ext, ".mp3") == 0 ||

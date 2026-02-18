@@ -1,6 +1,7 @@
 #ifndef FORMAT_H
 #define FORMAT_H
 
-char* getFileNameWithoutExt(const char* path);
+void getFileNameWithoutExt(const char *path, char *out);
+
 
 #endif

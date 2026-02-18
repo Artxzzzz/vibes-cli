@@ -48,12 +48,22 @@ int getAudio(const char *folderPath, char files[][PATH_MAX], int maxFiles) {
 
     struct dirent *dir;
     while ((dir = readdir(d)) != NULL) {
-        if (dir->d_type == DT_REG && isAudioFile(dir->d_name)) {
+        struct stat st;
+        char full[PATH_MAX];
+
+        snprintf(full, sizeof(full), "%s/%s", folderPath, dir->d_name);
+
+        if (stat(full, &st) == 0 &&
+            S_ISREG(st.st_mode) &&
+            isAudioFile(dir->d_name)) {
+
             strncpy(files[count], dir->d_name, PATH_MAX-1);
             files[count][PATH_MAX-1] = '\0';
             count++;
+            
             if (count >= maxFiles) break;
         }
+
     }
 
     closedir(d);
