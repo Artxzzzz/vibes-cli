@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-Player* playerCreate() {
+Player* playerCreate(int loopValue) {
     if (SDL_Init(SDL_INIT_AUDIO) < 0) return NULL;
 
     if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0) {
@@ -26,6 +26,7 @@ Player* playerCreate() {
     p->running = 0;
     p->paused = 0;
     p->quit = 0;
+    p->loop = -loopValue;
 
     p->progressThread = NULL;
     memset(p->currentPath, 0, PATH_MAX);
@@ -36,6 +37,7 @@ Player* playerCreate() {
 int loadPlayer(Player *p, const char *path) {
     if (p->music) {
         Mix_FreeMusic(p->music);
+        p->music = NULL;
     }
 
     p->music = Mix_LoadMUS(path);
@@ -43,11 +45,12 @@ int loadPlayer(Player *p, const char *path) {
 
     strncpy(p->currentPath, path, PATH_MAX);
     p->duration = Mix_MusicDuration(p->music);
+    
     p->running = 1;
     p->paused = 0;
     
     Mix_VolumeMusic(p->vol);
-    Mix_PlayMusic(p->music, 0);
+    Mix_PlayMusic(p->music, p->loop);
     
     return 1;
 }

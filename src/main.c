@@ -11,6 +11,9 @@
 
 int main(int argc, char **argv) {
     int tosleep = 1;
+    int versionBool = 0;
+    int loop = 0;
+
     int result = 0;
 
     if (argc < 2) {
@@ -18,37 +21,47 @@ int main(int argc, char **argv) {
         return 1;
     }
 
-    if (strcmp(argv[1], "-v") == 0 || strcmp(argv[1], "--version") == 0) {
+    for (int arg = 1; arg < argc; arg++) {
+        if (strcmp(argv[arg], "-v") == 0 || strcmp(argv[arg], "--version") == 0) versionBool = 1;
+        if (strcmp(argv[arg], "-s") == 0 || strcmp(argv[arg], "--sleep") == 0) tosleep = 0;
+        if (strcmp(argv[arg], "-l") == 0 || strcmp(argv[arg], "--loop") == 0) loop = 1;
+    }
+
+    if (versionBool) {
         printf("Vibes %s\n", version);
         return 0;
     }
 
-    if (argc >= 3 && (strcmp(argv[2], "-s") == 0 || strcmp(argv[2], "--sleep") == 0)) {
-        tosleep = 0;
-    }
-
-    Player *p = playerCreate();
-    if (!p) return 1;
-    
+    int loopOriginal = loop;
     char *folder = checkFolder(argv[1]);
 
+    if (folder && loop) loop = 0;
+
+    Player *p = playerCreate(loop);
+    if (!p) return 1;
+    loop = loopOriginal;
+    
     if (folder) {
         char files[100][PATH_MAX];
         int total = getAudio(folder, files, 100);
+        
+        do {
+            for (int audio = 0; audio < total; audio++) {
+                char path[PATH_MAX * 2];
+                
+                #ifdef _WIN32
+                    snprintf(path, sizeof(path), "%s\\%s", folder, files[audio]);
+                #else
+                    snprintf(path, sizeof(path), "%s/%s", folder, files[audio]);
+                #endif
 
-        for (int audio = 0; audio < total; audio++) {
-            char path[PATH_MAX * 2];
-            
-            #ifdef _WIN32
-                snprintf(path, sizeof(path), "%s\\%s", folder, files[audio]);
-            #else
-                snprintf(path, sizeof(path), "%s/%s", folder, files[audio]);
-            #endif
+                play(p, path);
 
-            play(p, path);
-            
-            if (tosleep) msleep(.25);
-        }
+                if (p->quit) break;
+
+                if (tosleep) msleep(.25);
+            }
+        } while(loop && !p->quit);
 
         result = 0;
         free(folder);
