@@ -9,6 +9,7 @@
 #include "play/play.h"
 #include "playDirectory/inc.h"
 #include "player/player.h"
+#include "help/help.h"
 
 #define ISARG(short_opt, long_opt) \
     (strcmp(argv[arg], "-" short_opt) == 0 || \
@@ -31,6 +32,7 @@ int main(int argc, char **argv) {
         if (ISARG("v", "version")) {versionBool = 1; continue;}
         if (ISARG("s", "sleep")) {tosleep = 0; continue;}
         if (ISARG("l", "loop")) {loop = 1; continue;}
+        if (ISARG("h", "help")) {help(); return 0;}
 
         if (argv[arg][0] == '-') {
             fprintf(stderr, "Error: unknown option: '%s'\n", argv[arg]);
@@ -43,6 +45,11 @@ int main(int argc, char **argv) {
     if (versionBool) {
         printf("Vibes %s\n", version);
         return 0;
+    }
+
+    if (!musicPath) {
+        fprintf(stderr, "No music file provided.\n");
+        return 1;
     }
 
     int loopOriginal = loop;
