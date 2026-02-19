@@ -1,8 +1,9 @@
 #include <stdio.h>
 #include <limits.h> 
+
 #include "play.h"
 #include "../player/player.h"
-
+#include "../history/history.h"
 #include "utils/resolve/resolve.h"
 #include "utils/format/format.h"
 #include "utils/input/input.h"
@@ -24,6 +25,7 @@ int play(Player *p, char *musicPath) {
     char name[PATH_MAX];
     getFileNameWithoutExt(real, name);
 
+    historyAdd(name);
     printf("\nPlaying %s... Press \"q\" to exit\n", name);
 
     p->progressThread = SDL_CreateThread(progressThread, "Progress", p);
@@ -31,7 +33,6 @@ int play(Player *p, char *musicPath) {
     if (!p->progressThread) {
         printf("Failed to create progress thread\n");
     }
-
 
     input(p);
 

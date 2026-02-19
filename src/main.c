@@ -10,6 +10,7 @@
 #include "playDirectory/inc.h"
 #include "player/player.h"
 #include "help/help.h"
+#include "history/history.h"
 
 #define ISARG(short_opt, long_opt) \
     (strcmp(argv[arg], "-" short_opt) == 0 || \
@@ -33,6 +34,7 @@ int main(int argc, char **argv) {
         if (ISARG("s", "sleep")) {tosleep = 0; continue;}
         if (ISARG("l", "loop")) {loop = 1; continue;}
         if (ISARG("h", "help")) {help(); return 0;}
+        if (ISARG("H", "history")) {showHistory(); return 0;}
 
         if (argv[arg][0] == '-') {
             fprintf(stderr, "Error: unknown option: '%s'\n", argv[arg]);
@@ -52,6 +54,7 @@ int main(int argc, char **argv) {
         return 1;
     }
 
+    historyInit();
     int loopOriginal = loop;
     char *folder = checkFolder(musicPath);
 

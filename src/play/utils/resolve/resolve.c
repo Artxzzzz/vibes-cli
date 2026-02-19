@@ -4,6 +4,7 @@
     #include <windows.h>
 #else
     #include <dirent.h>
+    #include <strings.h>
 #endif
 
 #include <stdio.h>
@@ -11,17 +12,16 @@
 
 int resolvePath(char *input, char *output) {
     #ifdef _WIN32
-        if (GetFileAttributes(input) != INVALID_FILE_ATTRIBUTES) {
-            strcpy(output, input);
-            return 1;
-        }
-
         WIN32_FIND_DATA fd;
         HANDLE h;
-        char pattern[MAX_PATH];
 
-        snprintf(pattern, sizeof(pattern), "%s.*", input);
-        h = FindFirstFile(pattern, &fd);
+        h = FindFirstFile(input, &fd);
+
+        if (h == INVALID_HANDLE_VALUE) {
+            char pattern[MAX_PATH];
+            snprintf(pattern, sizeof(pattern), "%s.*", input);
+            h = FindFirstFile(pattern, &fd);
+        }
 
         if (h != INVALID_HANDLE_VALUE) {
             snprintf(output, PATH_MAX, "%s", fd.cFileName);
@@ -43,12 +43,15 @@ int resolvePath(char *input, char *output) {
 
 
         DIR *dir = opendir(".");
+        if (!dir) return 0;
+
         struct dirent *ent;
+        size_t inputLen = strlen(input);
 
         while ((ent = readdir(dir)) != NULL) {
 
-            if (strncmp(ent->d_name, input, strlen(input)) == 0 &&
-                ent->d_name[strlen(input)] == '.') {
+            if (strncasecmp(ent->d_name, input, inputLen) == 0 &&
+                (ent->d_name[inputLen] == '.' || ent->d_name[inputLen] == '\0')) {
 
                 snprintf(output, PATH_MAX, "%s", ent->d_name);
                 closedir(dir);

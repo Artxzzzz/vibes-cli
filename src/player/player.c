@@ -26,7 +26,7 @@ Player* playerCreate(int loopValue) {
     p->running = 0;
     p->paused = 0;
     p->quit = 0;
-    p->loop = -loopValue;
+    p->loop = -loopValue; // -1 = loop in SDL and -0 (GCC read as 0) play once
 
     p->progressThread = NULL;
     memset(p->currentPath, 0, PATH_MAX);
