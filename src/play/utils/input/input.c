@@ -19,15 +19,25 @@
             tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
         }
     }
+
 #endif
 
+#define KEYUP    1001
+#define KEYDOWN  1002
+#define KEYLEFT  1003
+#define KEYRIGHT 1004
+
 void input(Player* p) {
+
+    static Uint32 lastSeekTime = 0;
+    
 
     #ifndef _WIN32
         setConio(1); 
     #endif
 
     while (p->running && !p->quit) {
+        Uint32 currentTime = SDL_GetTicks();
 
         if (!Mix_PlayingMusic() && !Mix_PausedMusic()) {
             break;
@@ -42,10 +52,10 @@ void input(Player* p) {
             if (ch == 0 || ch == 224) {
                 ch = _getch();
 
-                if (ch == 72) ch = 'U';
-                else if (ch == 80) ch = 'D';
-                else if (ch == 75) ch = 'L';
-                else if (ch == 77) ch = 'R';
+                if (ch == 72) ch = KEYUP;
+                else if (ch == 80) ch = KEYDOWN;
+                else if (ch == 75) ch = KEYLEFT;
+                else if (ch == 77) ch = KEYRIGHT;
             }
         }
         #else
@@ -64,10 +74,10 @@ void input(Player* p) {
                 if (getchar() == '[') {
 
                     switch (getchar()) {
-                        case 'A': ch = 'U'; break;
-                        case 'B': ch = 'D'; break;
-                        case 'D': ch = 'L'; break;
-                        case 'C': ch = 'R'; break;
+                        case 'A': ch = KEYUP; break;
+                        case 'B': ch = KEYDOWN; break;
+                        case 'D': ch = KEYLEFT; break;
+                        case 'C': ch = KEYRIGHT; break;
                     }
                 }
             }
@@ -95,33 +105,44 @@ void input(Player* p) {
                     else Mix_ResumeMusic();
                     break;
 
-                case 'U':
+                case KEYUP:
 
                     p->vol = (p->vol + 8 > 128) ? 128 : p->vol + 8;
                     Mix_VolumeMusic(p->vol);
                     break;
 
-                case 'D':
+                case KEYDOWN:
 
                     p->vol = (p->vol - 8 < 0) ? 0 : p->vol - 8;
                     Mix_VolumeMusic(p->vol);
                     break;
 
-                case 'R':
+                case KEYRIGHT:
 
-                    {
+                    if (currentTime - lastSeekTime > 150) {
                         double pos = Mix_GetMusicPosition(p->music);
-                        if (pos >= 0) Mix_SetMusicPosition(pos + 5.0);
+                        if (pos >= 0) {
+
+                            Mix_PauseMusic();
+                            Mix_SetMusicPosition(pos + 5.0);
+                            Mix_ResumeMusic();
+                            lastSeekTime = currentTime;
+
+                        }
                     }
                     break;
 
-                case 'L':
-                    {
+                case KEYLEFT:
+
+                    if (currentTime - lastSeekTime > 150) {
                         double pos = Mix_GetMusicPosition(p->music);
                         if (pos >= 0) {
-                            double new_pos = (pos - 5.0 < 0) ? 0 : pos - 5.0;
+                            double newPos = (pos - 5.0 < 0) ? 0 : pos - 5.0;
+                            Mix_PauseMusic();
                             Mix_RewindMusic();
-                            Mix_SetMusicPosition(new_pos);
+                            Mix_SetMusicPosition(newPos);
+                            Mix_ResumeMusic();
+                            lastSeekTime = currentTime;
                         }
                     }
                     break;
