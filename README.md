@@ -24,7 +24,7 @@
 * **GCC** or **Clang**
 * Operating System: **Windows** and **Linux** (I don't know if it works on macOS yet)
 
-** ⚠️ Note:** if you are on Linux, make sure you have `libsdl2-dev` & `libsdl2-mixer-dev`. You can install them using:
+**⚠️ Note:** if you are on Linux, make sure you have `libsdl2-dev` & `libsdl2-mixer-dev`. You can install them using:
 ``` bash
 sudo apt install libsdl2-dev libsdl2-mixer-dev
 ```
