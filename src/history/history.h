@@ -1,8 +1,13 @@
 #ifndef HISTORY_H
 #define HISTORY_H
 
-void historyAdd(const char *musicPath);
+#include <limits.h>
+
+extern char historyPath[PATH_MAX];
+extern int historyOk;
+
 void historyInit();
-void showHistory();
+void historyAdd(const char *musicPath);
+void showHistory(const char *val);
 
 #endif

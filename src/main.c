@@ -41,7 +41,7 @@ int main(int argc, char **argv) {
         if (ISARG("s", "sleep")) {tosleep = 0; continue;}
         if (ISARG("l", "loop")) {loop = 1; continue;}
         if (ISARG("h", "help")) {help(); return 0;}
-        if (ISARG("H", "history")) {showHistory(); return 0;}
+        if (ISARG("H", "history")) {showHistory(val); return 0;}
         if (ISARG(NULL, "no-save")) {historyActive = 0; continue;}
         if (ISARG("V", "volume")) {
             if (val) 
