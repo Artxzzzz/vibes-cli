@@ -47,7 +47,7 @@ make
 
 # Or, if you want to compile manually with GCC (Windows PowerShell)
 gcc (Get-ChildItem -Recurse src/*.c | ForEach-Object { $_.FullName }) -o vibes -IC:/SDL2/include -LC:/SDL2/lib -lmingw32 -lSDL2main -lSDL2 -lSDL2_mixer -Wall -g
-Or (Linux or Git Bash)
+# Or (Linux or Git Bash)
 shopt -s globstar && gcc src/**/*.c -o vibes -lSDL2 -lSDL2_mixer -Wall -g
 ```
 
@@ -58,10 +58,10 @@ shopt -s globstar && gcc src/**/*.c -o vibes -lSDL2 -lSDL2_mixer -Wall -g
 ```bash
 # After compiling, run with (Windows)
 ./vibes.exe <music/directory>
-or (Linux)
+# or (Linux)
 ./vibes <music/directory>
 
-For more details help, use the flag -h or --help
+# For more details help, use the flag -h or --help
 ```
 
 <br>
