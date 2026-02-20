@@ -19,7 +19,7 @@ typedef struct {
     SDL_Thread* progressThread; // Progress bar Thread
 } Player;
 
-Player *playerCreate(int loopValue);
+Player *playerCreate(int loopValue, int vol);
 void playerDestroy(Player *p);
 
 int loadPlayer(Player *p, const char *path);

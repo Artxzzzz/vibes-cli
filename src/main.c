@@ -11,16 +11,21 @@
 #include "player/player.h"
 #include "help/help.h"
 #include "history/history.h"
+#include "checkarg/checkarg.h"
 
 #define ISARG(short_opt, long_opt) \
-    (strcmp(argv[arg], "-" short_opt) == 0 || \
-     strcmp(argv[arg], "--" long_opt) == 0)
+    isarg(argv[arg], short_opt, long_opt, &val)
+
 
 int main(int argc, char **argv) {
     int tosleep = 1;
+    int historyActive = 1;
+
     int versionBool = 0;
     int loop = 0;
+    int vol = 0;
     char *musicPath = NULL;
+    
 
     int result = 0;
 
@@ -30,11 +35,31 @@ int main(int argc, char **argv) {
     }
 
     for (int arg = 1; arg < argc; arg++) {
+        const char *val;
+
         if (ISARG("v", "version")) {versionBool = 1; continue;}
         if (ISARG("s", "sleep")) {tosleep = 0; continue;}
         if (ISARG("l", "loop")) {loop = 1; continue;}
         if (ISARG("h", "help")) {help(); return 0;}
         if (ISARG("H", "history")) {showHistory(); return 0;}
+        if (ISARG(NULL, "no-save")) {historyActive = 0; continue;}
+        if (ISARG("V", "volume")) {
+            if (val) 
+            {
+                int num = atoi(val);
+
+                if (num < 0 || num > 100) {
+                    printf("Invalid volume: '%s'. Must be a number (0-100).\n", val);
+                    printf("Using default volume\n");
+
+                    num = -1;
+                }
+
+                vol = (num * 128 / 100); // For visual, small precision less but it's necessary
+            }
+
+            continue;
+        }
 
         if (argv[arg][0] == '-') {
             fprintf(stderr, "Error: unknown option: '%s'\n", argv[arg]);
@@ -54,13 +79,13 @@ int main(int argc, char **argv) {
         return 1;
     }
 
-    historyInit();
+    if (historyActive) historyInit();
     int loopOriginal = loop;
     char *folder = checkFolder(musicPath);
 
     if (folder && loop) loop = 0;
 
-    Player *p = playerCreate(loop);
+    Player *p = playerCreate(loop, vol);
     if (!p) return 1;
     loop = loopOriginal;
     

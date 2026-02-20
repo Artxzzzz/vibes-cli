@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-Player* playerCreate(int loopValue) {
+Player* playerCreate(int loopValue, int vol) {
     if (SDL_Init(SDL_INIT_AUDIO) < 0) return NULL;
 
     if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0) {
@@ -22,7 +22,7 @@ Player* playerCreate(int loopValue) {
 
     p->music = NULL;
     p->duration = 0;
-    p->vol = MIX_MAX_VOLUME; // 128
+    p->vol = (vol == -1) ? MIX_MAX_VOLUME : vol; // 128 if vol != -1
     p->running = 0;
     p->paused = 0;
     p->quit = 0;

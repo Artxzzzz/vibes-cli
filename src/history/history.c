@@ -13,12 +13,9 @@
     #define BAR "/"
 #endif
 
-#define CONFIGDIR ".config"
-#define VIBESDIR  "vibes"
-#define CONFIGFILE ".vibes_history"
-
 #include "history.h"
 #include "util/getUser.h"
+#include "../config/config.h"
 
 static char historyPath[512];
 static int historyOk = 0;

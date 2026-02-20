@@ -21,7 +21,15 @@ void help() {
     printf("\n%sOptions:%s\n", bold, unbold);
 
     for (int flag = 0; flag < totalFlags; flag++) {
-        printf("  -%s%s%s, --%s%-15s%s %s\n",
+        if (flags[flag].shortOpt[0] == '\0') {
+            printf("  --%s%-19s%s %s\n",
+                bold,
+                flags[flag].longOpt,
+                unbold,
+                flags[flag].description
+            );
+        } else {
+            printf("  -%s%s%s, --%s%-15s%s %s\n",
             bold,
             flags[flag].shortOpt,
             unbold,
@@ -29,6 +37,7 @@ void help() {
             flags[flag].longOpt,
             unbold,
             flags[flag].description);
+        }
     }
 
     line(barWidth);
