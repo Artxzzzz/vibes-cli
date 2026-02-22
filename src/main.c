@@ -20,10 +20,10 @@
 int main(int argc, char **argv) {
     int tosleep = 1;
     int historyActive = 1;
+    int vol = -1;
 
     int versionBool = 0;
     int loop = 0;
-    int vol = 0;
     char *musicPath = NULL;
     
 
@@ -44,8 +44,7 @@ int main(int argc, char **argv) {
         if (ISARG("H", "history")) {showHistory(val); return 0;}
         if (ISARG(NULL, "no-save")) {historyActive = 0; continue;}
         if (ISARG("V", "volume")) {
-            if (val) 
-            {
+            if (val) {
                 int num = atoi(val);
 
                 if (num < 0 || num > 100) {
@@ -56,6 +55,11 @@ int main(int argc, char **argv) {
                 }
 
                 vol = (num * 128 / 100); // For visual, small precision less but it's necessary
+            }
+
+            else {
+                printf("Invalid volume.\n", val);
+                printf("Using default volume\n");
             }
 
             continue;

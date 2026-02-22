@@ -25,7 +25,7 @@ int isarg(const char *arg, const char *shortOpt, const char *longOpt, const char
         size_t len = strlen(buf);
 
         if (strncmp(arg, buf, len) == 0) {
-            if (arg[2] == '=') {
+            if (arg[len] == '=') {
                 *value = arg + len + 1;
             } else {
                 *value = NULL;
