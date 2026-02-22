@@ -2,9 +2,10 @@
 #include <stdio.h>
 #include <string.h>
 #include <limits.h>
+#include <locale.h>
 #include <stdlib.h>
 
-#include "sleep/sleep.h"
+#include "helpers/helpers.h"
 #include "config/config.h"
 #include "play/play.h"
 #include "playDirectory/inc.h"
@@ -13,11 +14,28 @@
 #include "history/history.h"
 #include "checkarg/checkarg.h"
 
+#ifdef _WIN32
+#include <windows.h>
+#include <io.h>
+#include <fcntl.h>
+#endif
+
 #define ISARG(short_opt, long_opt) \
     isarg(argv[arg], short_opt, long_opt, &val)
 
 
 int main(int argc, char **argv) {
+    setlocale(LC_ALL, "");
+
+    #ifdef _WIN32
+    _setmode(_fileno(stdout), _O_BINARY);
+    SetConsoleOutputCP(CP_UTF8);
+    SetConsoleCP(CP_UTF8);
+    #endif
+
+    Config cfg;
+    loadConfig(&cfg);
+
     int tosleep = 1;
     int historyActive = 1;
     int vol = -1;
@@ -39,7 +57,7 @@ int main(int argc, char **argv) {
 
         if (ISARG("v", "version")) {versionBool = 1; continue;}
         if (ISARG("s", "sleep")) {tosleep = 0; continue;}
-        if (ISARG("l", "loop")) {loop = 1; continue;}
+        if (ISARG("l", "loop")) {loop = !loop; continue;}
         if (ISARG("h", "help")) {help(); return 0;}
         if (ISARG("H", "history")) {showHistory(val); return 0;}
         if (ISARG(NULL, "no-save")) {historyActive = 0; continue;}
@@ -49,7 +67,7 @@ int main(int argc, char **argv) {
 
                 if (num < 0 || num > 100) {
                     printf("Invalid volume: '%s'. Must be a number (0-100).\n", val);
-                    printf("Using default volume\n");
+                    printf("Using default volume.\n");
 
                     num = -1;
                 }
@@ -58,7 +76,7 @@ int main(int argc, char **argv) {
             }
 
             else {
-                printf("Invalid volume.\n", val);
+                printf("Invalid volume.\n");
                 printf("Using default volume\n");
             }
 
@@ -85,11 +103,13 @@ int main(int argc, char **argv) {
 
     if (historyActive) historyInit();
     int loopOriginal = loop;
+
     char *folder = checkFolder(musicPath);
 
     if (folder && loop) loop = 0;
+    if (vol == -1) vol = cfg.defaultVolume;
 
-    Player *p = playerCreate(loop, vol);
+    Player *p = playerCreate(loop, vol, cfg);
     if (!p) return 1;
     loop = loopOriginal;
     

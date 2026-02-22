@@ -24,6 +24,11 @@ int progressThread(void* ptr) {
     Player *p = (Player*)ptr;
 
     while (p->running && !p->quit) {
+        if (!p->config.showBar) {
+            SDL_Delay(500);
+            continue;
+        }
+
         double elapsed = Mix_GetMusicPosition(p->music);
         if (elapsed < 0) break;
 
@@ -36,11 +41,15 @@ int progressThread(void* ptr) {
             continue;
         }
 
-        int reserved = 50;
+        int reserved = 40;
+
         int barWidth = termWidth - reserved;
 
-        if (barWidth > 50) barWidth = 50;
-        if (barWidth < 10) {
+        if (barWidth > p->config.barMaxWidth) {
+            barWidth = p->config.barMaxWidth;
+        }
+
+        if (barWidth < 5) {
             printf("\rToo small\033[K");
             fflush(stdout);
             SDL_Delay(500);
@@ -56,17 +65,17 @@ int progressThread(void* ptr) {
 
         int pos = (int)((elapsed * barWidth) / p->duration);
         int volPercent = (p->vol * 100) / 128;
+        volPercent = (volPercent + 2) / 5 * 5;
 
         printf("\r[");
         for (int i = 0; i < barWidth; i++) {
-            printf(i < pos ? "#" : ".");
+            printf("%s", i < pos ? p->config.barChar : p->config.emptyChar);
         }
 
         printf("] %d:%02d / %d:%02d | Vol: %d%% %s\033[K", 
-
-            (int)elapsed/60, (int)elapsed%60, 
-            (int)p->duration/60, (int)p->duration%60, 
-            volPercent, p->paused ? "(PAUSED)" : "");
+        (int)elapsed/60, (int)elapsed%60, 
+        (int)p->duration/60, (int)p->duration%60, 
+        volPercent, p->paused ? "(PAUSED)" : "");
         
         fflush(stdout);
         SDL_Delay(500);

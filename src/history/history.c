@@ -15,7 +15,7 @@
 #endif
 
 #include "history.h"
-#include "util/getUser.h"
+#include "../helpers/helpers.h"
 #include "../config/config.h"
 
 int historyOk = 0;
@@ -43,7 +43,7 @@ void historyInit() {
     ensureDirExists(configPath);
     ensureDirExists(vibesPath);
 
-    snprintf(historyPath, sizeof(historyPath), "%s" BAR "%s", vibesPath, CONFIGFILE);
+    snprintf(historyPath, sizeof(historyPath), "%s" BAR "%s", vibesPath, HISTORYFILE);
 
     FILE *f = fopen(historyPath, "a");
 

@@ -107,13 +107,13 @@ void input(Player* p) {
 
                 case KEYUP:
 
-                    p->vol = (p->vol + 8 > 128) ? 128 : p->vol + 8;
+                    p->vol = (p->vol + 5 > 128) ? 128 : p->vol + 5;
                     Mix_VolumeMusic(p->vol);
                     break;
 
                 case KEYDOWN:
 
-                    p->vol = (p->vol - 8 < 0) ? 0 : p->vol - 8;
+                    p->vol = (p->vol - 5 < 0) ? 0 : p->vol - 5;
                     Mix_VolumeMusic(p->vol);
                     break;
 

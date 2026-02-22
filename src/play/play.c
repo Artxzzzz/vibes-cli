@@ -26,7 +26,7 @@ int play(Player *p, char *musicPath) {
     getFileNameWithoutExt(real, name);
 
     historyAdd(name);
-    printf("\nPlaying %s... Press \"q\" to exit\n", name);
+    if (p->config.playingMessage) printf("\nPlaying %s... Press \"q\" to exit\n", name);
 
     p->progressThread = SDL_CreateThread(progressThread, "Progress", p);
 

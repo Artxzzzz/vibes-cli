@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-Player* playerCreate(int loopValue, int vol) {
+Player* playerCreate(int loopValue, int vol, Config cfg) {
     if (SDL_Init(SDL_INIT_AUDIO) < 0) return NULL;
 
     if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0) {
@@ -27,6 +27,8 @@ Player* playerCreate(int loopValue, int vol) {
     p->paused = 0;
     p->quit = 0;
     p->loop = -loopValue; // -1 = loop in SDL and -0 (GCC read as 0) play once
+
+    p->config = cfg;
 
     p->progressThread = NULL;
     memset(p->currentPath, 0, PATH_MAX);
