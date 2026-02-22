@@ -61,6 +61,8 @@ int main(int argc, char **argv) {
         if (ISARG("h", "help")) {help(); return 0;}
         if (ISARG("H", "history")) {showHistory(val); return 0;}
         if (ISARG(NULL, "no-save")) {historyActive = 0; continue;}
+        if (ISARG(NULL, "gen-config")) {gen(&cfg); continue;}
+
         if (ISARG("V", "volume")) {
             if (val) {
                 int num = atoi(val);

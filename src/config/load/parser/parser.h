@@ -19,6 +19,8 @@ void parseBarWidth(Config *cfg, const char *value);
 typedef struct {
     const char *key;
     void (*handler)(Config *cfg, const char *value);
+    
+    const char *default_value;
 } ConfigOption;
 
 extern const ConfigOption options[];

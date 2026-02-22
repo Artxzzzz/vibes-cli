@@ -80,12 +80,9 @@ void loadConfig(Config *cfg) {
     char line[256];
 
     while (fgets(line, sizeof(line), f)) {
-        char *comment = strchr(line, '#');
-        if (comment) *comment = '\0';
-
         char *trimmedLine = trim(line);
 
-        if (trimmedLine[0] == '\0' || trimmedLine[0] == '\n') {
+        if (trimmedLine[0] == '\0' || trimmedLine[0] == '#') {
             continue;
         }
 
@@ -93,12 +90,23 @@ void loadConfig(Config *cfg) {
         if (!equal) continue;
 
         *equal = '\0';
+        char *key = trimmedLine;
+        char *valuePart = equal + 1;
+        
+        while (isspace((unsigned char)*valuePart)) valuePart++;
 
-        char *key = line;
-        char *value = equal + 1;
+        if (valuePart[0] == '#') {
+
+            char *secondHash = strchr(valuePart + 1, '#');
+            if (secondHash) *secondHash = '\0';
+        } else {
+
+            char *firstHash = strchr(valuePart, '#');
+            if (firstHash) *firstHash = '\0';
+        }
 
         trim(key);
-        trim(value);
+        char *value = trim(valuePart);
 
 
         int found = 0;
@@ -119,4 +127,37 @@ void loadConfig(Config *cfg) {
         
     }
     fclose(f);
+}
+
+int gen(Config *cfg) {
+    char *home = getUser();
+
+    if (!home) {
+        return 1;
+    }
+
+    char configPath[PATH_MAX];
+    char vibesPath[PATH_MAX];
+
+    snprintf(configPath, sizeof(configPath), "%s" BAR "%s", home, CONFIGDIR);
+    snprintf(vibesPath, sizeof(vibesPath), "%s" BAR "%s", configPath, VIBESDIR);
+    ensureDirExists(configPath);
+    ensureDirExists(vibesPath);
+
+    char configFile[PATH_MAX];
+    snprintf(configFile, sizeof(configFile), "%s" BAR "%s", vibesPath, CONFIGFILE);
+
+    FILE *f = fopen(configFile, "w");
+    if (!f) { printf("Error to generate the config file"); return 1; }
+
+    fprintf(f, "# Vibes config file\n\n\n");
+
+    for (int i = 0; i < sizeOpt; i++) {
+        fprintf(f, "%s=%s\n", options[i].key, options[i].default_value);
+    }
+
+    fclose(f);
+    printf("Sucessfully generated config file in '%s'", configFile);
+
+    return 0;
 }

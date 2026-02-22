@@ -13,6 +13,7 @@ typedef struct {
 } Config;
 
 void loadConfig(Config *cfg);
+int gen(Config *cfg);
 
 
 #endif
