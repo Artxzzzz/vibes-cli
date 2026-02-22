@@ -7,7 +7,8 @@ const ConfigOption options[] = {
     {"playing_message",  parsePlayMsg, "true"},
     {"bar_char",         parseBarChar, "#"},
     {"empty_char",       parseEmptyChar, "."},
-    {"bar_max_width",    parseBarWidth, "50"}
+    {"bar_max_width",    parseBarWidth, "50"},
+    {"active_history",    parseActiveHistory, "true"}
 };
 
 const int sizeOpt = sizeof(options) / sizeof(options[0]);

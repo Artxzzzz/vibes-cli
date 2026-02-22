@@ -6,6 +6,7 @@
 // Bool
 void parseShowBar(Config *cfg, const char *value);
 void parseLoop(Config *cfg, const char *value);
+void parseActiveHistory(Config *cfg, const char *value);
 void parsePlayMsg(Config *cfg, const char *value);
 
 // Char

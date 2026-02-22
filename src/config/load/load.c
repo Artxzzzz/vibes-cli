@@ -67,10 +67,14 @@ void loadConfig(Config *cfg) {
     FILE *f = fopen(configFile, "r");
 
     cfg->defaultVolume = 128;
-    cfg->showBar = 1;
-    cfg->barMaxWidth = 50;
-    cfg->defaultLoop = 0;
+
     cfg->playingMessage = 1;
+    cfg->showBar = 1;
+    cfg->activeHistory = 1;
+    cfg->defaultLoop = 0;
+
+    cfg->barMaxWidth = 50;
+    
     strncpy(cfg->barChar, "#", sizeof(cfg->barChar));
     strncpy(cfg->emptyChar, ".", sizeof(cfg->emptyChar));
 
@@ -92,7 +96,7 @@ void loadConfig(Config *cfg) {
         *equal = '\0';
         char *key = trimmedLine;
         char *valuePart = equal + 1;
-        
+
         while (isspace((unsigned char)*valuePart)) valuePart++;
 
         if (valuePart[0] == '#') {

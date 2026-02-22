@@ -6,6 +6,7 @@ typedef struct {
     int showBar;
     int defaultLoop;
     int playingMessage;
+    int activeHistory;
 
     int barMaxWidth;
     char barChar[8];

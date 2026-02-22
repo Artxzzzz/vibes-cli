@@ -6,41 +6,64 @@
 
 void showHistory(const char *val) {
     historyInit();
-    int linesShow = 0;
     
     FILE *f = fopen(historyPath, "r");
     if (!f) return;
 
-    char *content[100];
-    char buffer[256];
+    char **content = NULL;
+    char buffer[1024];
     int count = 0;
+    int cap = 15;
+
+    content = malloc(sizeof(char*) * cap);
+    if (!content) {
+        fclose(f);
+        return;
+    }
 
     while (fgets(buffer, sizeof(buffer), f)) {
         buffer[strcspn(buffer, "\n")] = 0;
 
-        content[count] = malloc(strlen(buffer) + 1);
-        strcpy(content[count], buffer);
+        if (count >= cap) {
+            cap *= 2;
+            char **temp = realloc(content, sizeof(char*) * cap);
+            if (!temp) {
+                fprintf(stderr, "Memory error to load the history\n");
+                break; 
+            }
+            content = temp;
+        }
 
-        count++;
+        content[count] = malloc(strlen(buffer) + 1);
+        
+        if (content[count]) {
+            strcpy(content[count], buffer);
+            count++;
+        }
     }
 
     fclose(f);
 
+    int linesShow = count;
     if (val) {
-        linesShow = atoi(val);
-
-        if (linesShow <= 0 || linesShow > count) {
-            printf("Invalid history line. Must be a number (0-%d).\n", count);
-            printf("Showing all...\n");
-
-            linesShow = count;
+        int request = atoi(val);
+        if (request > 0 && request <= count) {
+            linesShow = request;
+        } else if (request > count) {
+            printf("Warning: The historic only have %d enters.\n", count);
+        } else {
+            printf("Invalid lines number, showing all...\n");
         }
-
-        count = linesShow;
     }
 
-    for (int line = 0; line < count; line++) {
-        printf("%s\n", content[line]);
-        free(content[line]);
+    int startAt = count - linesShow;
+
+    for (int i = 0; i < count; i++) {
+        if (i >= startAt) {
+            printf("%s\n", content[i]);
+        }
+        free(content[i]);
     }
+
+    free(content);
 }

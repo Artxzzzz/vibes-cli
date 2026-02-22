@@ -7,7 +7,8 @@ Flag flags[] = {
     {"h", "help", "Show this help message"},
     {"H", "history", "Show all musics played (Max limit: 100)"},
     {"V", "volume", "Set the playback volume. Use: --volume=<value> (e.g., --volume=4)"},
-    {"", "no-save", "Dont save actual music"}
+    {"", "no-save", "Dont save actual music"},
+    {"", "gen-config", "Generate default config file"}
 };
 
 const int totalFlags = sizeof(flags) / sizeof(flags[0]);

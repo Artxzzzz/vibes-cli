@@ -37,14 +37,13 @@ int main(int argc, char **argv) {
     loadConfig(&cfg);
 
     int tosleep = 1;
-    int historyActive = 1;
+    int historyActive = cfg.activeHistory;
     int vol = -1;
 
     int versionBool = 0;
     int loop = 0;
     char *musicPath = NULL;
     
-
     int result = 0;
 
     if (argc < 2) {
@@ -58,10 +57,11 @@ int main(int argc, char **argv) {
         if (ISARG("v", "version")) {versionBool = 1; continue;}
         if (ISARG("s", "sleep")) {tosleep = 0; continue;}
         if (ISARG("l", "loop")) {loop = !loop; continue;}
+        if (ISARG(NULL, "no-save")) {historyActive = 0; continue;}
+
         if (ISARG("h", "help")) {help(); return 0;}
         if (ISARG("H", "history")) {showHistory(val); return 0;}
-        if (ISARG(NULL, "no-save")) {historyActive = 0; continue;}
-        if (ISARG(NULL, "gen-config")) {gen(&cfg); continue;}
+        if (ISARG(NULL, "gen-config")) {gen(&cfg); return 0;}
 
         if (ISARG("V", "volume")) {
             if (val) {
