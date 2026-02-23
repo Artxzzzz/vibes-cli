@@ -31,6 +31,11 @@ int main(int argc, char **argv) {
     _setmode(_fileno(stdout), _O_BINARY);
     SetConsoleOutputCP(CP_UTF8);
     SetConsoleCP(CP_UTF8);
+
+    freopen("NUL", "w", stderr);
+    
+    #else
+    freopen("/dev/null", "w", stderr);
     #endif
 
     Config cfg;
