@@ -67,6 +67,29 @@ int main(int argc, char **argv) {
         if (ISARG("h", "help")) {help(); return 0;}
         if (ISARG("H", "history")) {showHistory(val); return 0;}
         if (ISARG(NULL, "gen-config")) {gen(&cfg); return 0;}
+        
+        if (ISARG(NULL, "bar-width")) {
+            if (val) {
+                int num = atoi(val);
+
+                if (num < 10 || num > 50) {
+                    printf("Invalid max width: '%s'. Must be a number (10-50).\n", val);
+                    printf("Using default width.\n");
+
+                    num = 0;
+                }
+
+                if (num) cfg.barMaxWidth = num;
+
+            }
+
+            else {
+                printf("Invalid width.\n");
+                printf("Using default width\n");
+            }
+
+            continue;
+        }
 
         if (ISARG("V", "volume")) {
             if (val) {
@@ -104,7 +127,7 @@ int main(int argc, char **argv) {
     }
 
     if (!musicPath) {
-        fprintf(stderr, "No music file provided.\n");
+        printf("No music file provided.\n");
         return 1;
     }
 
