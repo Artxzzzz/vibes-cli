@@ -32,6 +32,13 @@ int main(int argc, char **argv) {
     SetConsoleOutputCP(CP_UTF8);
     SetConsoleCP(CP_UTF8);
 
+    HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
+    DWORD dwMode = 0;
+    GetConsoleMode(hOut, &dwMode);
+    dwMode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
+    SetConsoleMode(hOut, dwMode);
+
+
     freopen("NUL", "w", stderr);
     
     #else
@@ -67,7 +74,7 @@ int main(int argc, char **argv) {
         if (ISARG("h", "help")) {help(); return 0;}
         if (ISARG("H", "history")) {showHistory(val); return 0;}
         if (ISARG(NULL, "gen-config")) {gen(&cfg); return 0;}
-        
+
         if (ISARG(NULL, "bar-width")) {
             if (val) {
                 int num = atoi(val);

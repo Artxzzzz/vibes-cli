@@ -9,9 +9,16 @@ void parseLoop(Config *cfg, const char *value);
 void parseActiveHistory(Config *cfg, const char *value);
 void parsePlayMsg(Config *cfg, const char *value);
 
+
 // Char
 void parseBarChar(Config *cfg, const char *value);
 void parseEmptyChar(Config *cfg, const char *value);
+
+
+// String
+void parseEmptyCharColor(Config *cfg, const char *value);
+void parseFullCharColor(Config *cfg, const char *value);
+
 
 // Int
 void parseVol(Config *cfg, const char *value);

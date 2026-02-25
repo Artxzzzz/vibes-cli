@@ -77,6 +77,8 @@ void loadConfig(Config *cfg) {
     
     strncpy(cfg->barChar, "#", sizeof(cfg->barChar));
     strncpy(cfg->emptyChar, ".", sizeof(cfg->emptyChar));
+    strncpy(cfg->fullCharColor, "white", sizeof(cfg->fullCharColor));
+    strncpy(cfg->emptyCharColor, "white", sizeof(cfg->emptyCharColor));
 
 
     if (!f) return;

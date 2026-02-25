@@ -6,4 +6,12 @@
 
 int progressThread(void* ptr);
 
+typedef struct {
+    const char *name;
+    const char *value;
+} Colors;
+
+extern const Colors COLORS[];
+extern const int COLORSIZE;
+
 #endif

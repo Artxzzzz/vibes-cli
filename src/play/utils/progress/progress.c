@@ -20,6 +20,31 @@ static int getTerminalWidth() {
 #endif
 }
 
+const Colors COLORS[] = {
+    {"black",   "\x1b[30m"},
+    {"red",     "\x1b[31m"},
+    {"green",   "\x1b[32m"},
+    {"yellow",  "\x1b[33m"},
+    {"blue",    "\x1b[34m"},
+    {"magenta", "\x1b[35m"},
+    {"cyan",    "\x1b[36m"},
+    {"gray",    "\x1b[37m"},
+    {"white",   "\x1b[0m"},
+};
+
+const int COLORSIZE = sizeof(COLORS)/sizeof(COLORS[0]);
+
+void setColor(char *color) {
+    for (int idx = 0; idx < COLORSIZE; idx++) {
+        if (strcmp(COLORS[idx].name, color) == 0) {
+            printf("%s", COLORS[idx].value);
+            return;
+        }
+    }
+
+    printf("Color %s not found", color);
+}
+
 int progressThread(void* ptr) {
     Player *p = (Player*)ptr;
 
@@ -69,7 +94,23 @@ int progressThread(void* ptr) {
 
         printf("\r[");
         for (int i = 0; i < barWidth; i++) {
-            printf("%s", i < pos ? p->config.barChar : p->config.emptyChar);
+
+            char *ch;
+            char *color;
+
+            if (i < pos) {
+                ch = p->config.barChar;
+                color = p->config.fullCharColor;
+            } else {
+                ch = p->config.emptyChar;
+                color = p->config.emptyCharColor;
+            }
+            
+            setColor(color);
+
+            printf("%s", ch);
+
+            setColor("white");
         }
 
         printf("] %d:%02d / %d:%02d | Vol: %d%% %s\033[K", 

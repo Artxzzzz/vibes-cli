@@ -7,10 +7,13 @@ typedef struct {
     int defaultLoop;
     int playingMessage;
     int activeHistory;
-
     int barMaxWidth;
+
     char barChar[8];
     char emptyChar[8];
+
+    char emptyCharColor[8];
+    char fullCharColor[8];
 } Config;
 
 void loadConfig(Config *cfg);

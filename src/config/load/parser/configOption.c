@@ -8,7 +8,9 @@ const ConfigOption options[] = {
     {"bar_char",         parseBarChar, "#"},
     {"empty_char",       parseEmptyChar, "."},
     {"bar_max_width",    parseBarWidth, "50"},
-    {"active_history",    parseActiveHistory, "true"}
+    {"active_history",   parseActiveHistory, "true"},
+    {"empty_char_color", parseEmptyCharColor, "white"},
+    {"bar_char_color",   parseFullCharColor, "white"}
 };
 
 const int sizeOpt = sizeof(options) / sizeof(options[0]);
