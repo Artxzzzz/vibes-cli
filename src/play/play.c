@@ -9,8 +9,8 @@
 #include "utils/input/input.h"
 
 int play(Player *p, char *musicPath) {
-
     char real[PATH_MAX];
+    static char lastPath[PATH_MAX] = "";
 
     if (!resolvePath(musicPath, real)) {
         printf("File not found: %s\n", musicPath);
@@ -26,7 +26,13 @@ int play(Player *p, char *musicPath) {
     getFileNameWithoutExt(real, name);
 
     historyAdd(name);
-    if (p->config.playingMessage) printf("\nPlaying %s... Press \"q\" to exit\n", name);
+    
+    if (strcmp(lastPath, real) != 0) {
+        if (p->config.playingMessage) {
+            printf("\nPlaying %s... Press \"q\" to exit\n", name);
+        }
+        strncpy(lastPath, real, PATH_MAX);
+    }
 
     p->progressThread = SDL_CreateThread(progressThread, "Progress", p);
 
@@ -39,7 +45,9 @@ int play(Player *p, char *musicPath) {
     p->running = 0;
     SDL_WaitThread(p->progressThread, NULL);
 
-    printf("\n");
+    if (!p->loop || p->quit) {
+        printf("\n");
+    }
 
     return 0;
 }

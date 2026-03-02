@@ -26,6 +26,7 @@
 #define KEYDOWN  1002
 #define KEYLEFT  1003
 #define KEYRIGHT 1004
+#define ESC      1005
 
 void input(Player* p) {
 
@@ -36,10 +37,10 @@ void input(Player* p) {
         setConio(1); 
     #endif
 
-    while (p->running && !p->quit) {
+    while (!p->quit) {
         Uint32 currentTime = SDL_GetTicks();
 
-        if (!Mix_PlayingMusic() && !Mix_PausedMusic()) {
+        if (!Mix_PlayingMusic() && !Mix_PausedMusic() && !p->paused) {
             break;
         }
 
@@ -48,37 +49,49 @@ void input(Player* p) {
         #ifdef _WIN32
         if (_kbhit()) {
             ch = _getch();
-
             if (ch == 0 || ch == 224) {
                 ch = _getch();
-
                 if (ch == 72) ch = KEYUP;
                 else if (ch == 80) ch = KEYDOWN;
                 else if (ch == 75) ch = KEYLEFT;
                 else if (ch == 77) ch = KEYRIGHT;
+            } else if (ch == 27) {
+                ch = ESC;
+            }
+
+            if (ch == KEYRIGHT || ch == KEYLEFT) {
+                while(_kbhit()) _getch(); 
             }
         }
+
         #else
 
-        struct timeval tv = {0L, 0L};
-
+        struct timeval tv = {0L, 50000L};
         fd_set fds;
         FD_ZERO(&fds);
         FD_SET(0, &fds);
 
         if (select(1, &fds, NULL, NULL, &tv)) {
-
             ch = getchar();
+
             if (ch == 27) {
 
-                if (getchar() == '[') {
+                struct timeval tv_small = {0L, 50000L};
+                fd_set fds_small;
+                FD_ZERO(&fds_small);
+                FD_SET(0, &fds_small);
 
-                    switch (getchar()) {
-                        case 'A': ch = KEYUP; break;
-                        case 'B': ch = KEYDOWN; break;
-                        case 'D': ch = KEYLEFT; break;
-                        case 'C': ch = KEYRIGHT; break;
+                if (select(1, &fds_small, NULL, NULL, &tv_small)) {
+                    int next = getchar();
+                    if (next == '[') {
+                        int code = getchar();
+                        if (code == 'A') ch = KEYUP;
+                        else if (code == 'B') ch = KEYDOWN;
+                        else if (code == 'D') ch = KEYLEFT;
+                        else if (code == 'C') ch = KEYRIGHT;
                     }
+                } else {
+                    ch = ESC;
                 }
             }
         }
@@ -87,9 +100,11 @@ void input(Player* p) {
         if (ch != -1) {
 
             switch (ch) {
-
-                case 'q': case 'Q':
-                
+                case 'q': 
+                case 'Q': 
+                #ifdef _WIN32
+                case ESC: 
+                #endif
                     Mix_HaltMusic();
 
                     p->quit = 1;
@@ -109,6 +124,10 @@ void input(Player* p) {
 
                     p->vol = (p->vol + 5 > 128) ? 128 : p->vol + 5;
                     Mix_VolumeMusic(p->vol);
+                    break;
+
+                case 'L': case 'l':
+                    p->loop = !p->loop;
                     break;
 
                 case KEYDOWN:

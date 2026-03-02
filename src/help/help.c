@@ -14,7 +14,7 @@ static void line(int size) {
 #define barWidth 31
 
 void help() {
-    printf("Usage: vibes <music | directory> [options]\n\n");
+    printf("\n\nUsage: vibes <music | directory> [options]\n");
     
     line(barWidth);
 
@@ -47,4 +47,6 @@ void help() {
     printf("  %s%-22s%sPause/Resume\n", bold, "Space", unbold);
     printf("  %s%-22s%sQuit\n", bold, "Q", unbold);
     printf("  %s%-22s%sVolume / Seek\n", bold, "Arrows", unbold);
+    printf("  %s%-22s%sToggle loop\n", bold, "L", unbold);
+
 }

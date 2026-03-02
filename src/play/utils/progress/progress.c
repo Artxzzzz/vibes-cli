@@ -41,8 +41,6 @@ void setColor(char *color) {
             return;
         }
     }
-
-    printf("Color %s not found", color);
 }
 
 int progressThread(void* ptr) {
@@ -113,10 +111,11 @@ int progressThread(void* ptr) {
             setColor("white");
         }
 
-        printf("] %d:%02d / %d:%02d | Vol: %d%% %s\033[K", 
+        printf("] %d:%02d / %d:%02d | Vol: %d%% %s %s\033[K", 
         (int)elapsed/60, (int)elapsed%60, 
         (int)p->duration/60, (int)p->duration%60, 
-        volPercent, p->paused ? "(PAUSED)" : "");
+        volPercent, p->paused ? "(PAUSED)" : "",
+        p->loop ? "(LOOP)" : "");
         
         fflush(stdout);
         SDL_Delay(500);

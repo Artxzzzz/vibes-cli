@@ -24,7 +24,18 @@ int resolvePath(char *input, char *output) {
         }
 
         if (h != INVALID_HANDLE_VALUE) {
-            snprintf(output, PATH_MAX, "%s", fd.cFileName);
+            char *lastSlash = strrchr(input, '\\');
+            if (!lastSlash) lastSlash = strrchr(input, '/');
+
+            if (lastSlash) {
+                size_t dirLen = (lastSlash - input) + 1;
+                char dir[PATH_MAX];
+                strncpy(dir, input, dirLen);
+                dir[dirLen] = '\0';
+                snprintf(output, PATH_MAX, "%s%s", dir, fd.cFileName);
+            } else {
+                snprintf(output, PATH_MAX, "%s", fd.cFileName);
+            }
 
             FindClose(h);
             return 1;

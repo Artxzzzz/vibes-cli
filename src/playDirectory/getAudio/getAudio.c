@@ -22,7 +22,7 @@ int getAudio(const char *folderPath, char files[][PATH_MAX], int maxFiles) {
     snprintf(searchPath, sizeof(searchPath), "%s\\*", folderPath);
     hFind = FindFirstFile(searchPath, &findFileData);
     if (hFind == INVALID_HANDLE_VALUE) {
-        printf("Erro ao abrir o diretório: %s\n", folderPath);
+        printf("Error to open the directory: %s\n", folderPath);
         return 0;
     }
 
@@ -42,7 +42,7 @@ int getAudio(const char *folderPath, char files[][PATH_MAX], int maxFiles) {
 #else
     DIR *d = opendir(folderPath);
     if (!d) {
-        printf("Erro ao abrir o diretório: %s\n", folderPath);
+        printf("Error to open the directory: %s\n", folderPath);
         return 0;
     }
 

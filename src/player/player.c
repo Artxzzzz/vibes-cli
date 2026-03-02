@@ -19,14 +19,13 @@ Player* playerCreate(int loopValue, int vol, Config cfg) {
         return NULL;
     }
 
-
     p->music = NULL;
     p->duration = 0;
     p->vol = (vol == -1) ? MIX_MAX_VOLUME : vol; // 128 if vol != -1
     p->running = 0;
     p->paused = 0;
     p->quit = 0;
-    p->loop = -loopValue; // -1 = loop in SDL and -0 (GCC read as 0) play once
+    p->loop = loopValue; // -1 = loop in SDL and -0 (GCC read as 0) play once
 
     p->config = cfg;
 
@@ -52,7 +51,7 @@ int loadPlayer(Player *p, const char *path) {
     p->paused = 0;
     
     Mix_VolumeMusic(p->vol);
-    Mix_PlayMusic(p->music, p->loop);
+    Mix_PlayMusic(p->music, 0);
     
     return 1;
 }

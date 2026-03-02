@@ -68,7 +68,7 @@ int main(int argc, char **argv) {
 
         if (ISARG("v", "version")) {versionBool = 1; continue;}
         if (ISARG("s", "sleep")) {tosleep = 0; continue;}
-        if (ISARG("l", "loop")) {loop = !loop; continue;}
+        if (ISARG("l", "loop")) {loop = 1; continue;}
         if (ISARG(NULL, "no-save")) {historyActive = 0; continue;}
 
         if (ISARG("h", "help")) {help(); return 0;}
@@ -128,6 +128,10 @@ int main(int argc, char **argv) {
         musicPath = argv[arg];
     }
 
+    if (!loop) {
+        loop = cfg.defaultLoop;
+    }
+
     if (versionBool) {
         printf("Vibes %s\n", version);
         return 0;
@@ -139,22 +143,19 @@ int main(int argc, char **argv) {
     }
 
     if (historyActive) historyInit();
-    int loopOriginal = loop;
 
     char *folder = checkFolder(musicPath);
 
-    if (folder && loop) loop = 0;
     if (vol == -1) vol = cfg.defaultVolume;
 
     Player *p = playerCreate(loop, vol, cfg);
     if (!p) return 1;
-    loop = loopOriginal;
-    
+
     if (folder) {
         char files[100][PATH_MAX];
         int total = getAudio(folder, files, 100);
         
-        do {
+        while (!p->quit) {
             for (int audio = 0; audio < total; audio++) {
                 char path[PATH_MAX * 2];
                 
@@ -167,17 +168,20 @@ int main(int argc, char **argv) {
                 play(p, path);
 
                 if (p->quit) break;
-
                 if (tosleep) msleep(.25);
             }
-        } while(loop && !p->quit);
+
+            if (!p->loop || p->quit) break;
+        }
 
         result = 0;
         free(folder);
     }
 
     else {
-        result = play(p, musicPath);
+        do {
+            result = play(p, musicPath);
+        } while(p->loop && !p->quit);
     }
 
     playerDestroy(p);
