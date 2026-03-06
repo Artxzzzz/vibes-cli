@@ -18,5 +18,5 @@ void parseEmptyCharColor(Config *cfg, const char *value) {
         temp[i] = tolower((unsigned char)temp[i]);
     }
 
-    strncpy(cfg->fullCharColor, temp, sizeof(cfg->fullCharColor) - 1);
+    strncpy(cfg->emptyCharColor, temp, sizeof(cfg->emptyCharColor) - 1);
 }

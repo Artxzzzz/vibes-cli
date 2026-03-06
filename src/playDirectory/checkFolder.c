@@ -10,16 +10,26 @@
 #include <unistd.h>
 #endif
 
+#include "../helpers/helpers.h"
 
 char *checkFolder(char *path) {
-    struct stat info;
-    if (stat(path, &info) != 0 || !(info.st_mode & S_IFDIR)) {
-        return NULL;
-    }
-
     #ifdef _WIN32
-        char *fullPath = _fullpath(NULL, path, _MAX_PATH);
+        wchar_t wPath[PATH_MAX];
+        MultiByteToWideChar(CP_UTF8, 0, path, -1, wPath, PATH_MAX);
+
+        struct _stat64i32 info;
+        if (_wstat(wPath, &info) != 0 || !(info.st_mode & S_IFDIR)) {
+            return NULL;
+        }
+
+        wchar_t *wFullPath = _wfullpath(NULL, wPath, _MAX_PATH);
+        if (!wFullPath) return NULL;
+
+        char *fullPath = utf16ToUtf8(wFullPath);
+        free(wFullPath);
+        return fullPath;
     #else
+        struct stat info;
         char *fullPath = realpath(path, NULL); 
     #endif
 

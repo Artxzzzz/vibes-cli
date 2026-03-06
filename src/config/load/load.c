@@ -12,6 +12,7 @@
 
 #ifdef _WIN32
     #include <direct.h>
+    #include <windows.h>
     #define MKDIR(path) _mkdir(path)
     #define BAR "\\"
 #else
@@ -64,7 +65,13 @@ void loadConfig(Config *cfg) {
     char configFile[PATH_MAX];
     snprintf(configFile, sizeof(configFile), "%s" BAR "%s", vibesPath, CONFIGFILE);
 
-    FILE *f = fopen(configFile, "r");
+   #ifdef _WIN32
+    wchar_t wConfigFile[PATH_MAX];
+    MultiByteToWideChar(CP_UTF8, 0, configFile, -1, wConfigFile, PATH_MAX);
+    FILE *f = _wfopen(wConfigFile, L"r");
+    #else
+        FILE *f = fopen(configFile, "r");
+    #endif
 
     cfg->defaultVolume = 128;
 

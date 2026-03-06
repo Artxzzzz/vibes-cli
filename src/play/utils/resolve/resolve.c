@@ -12,29 +12,38 @@
 
 int resolvePath(char *input, char *output) {
     #ifdef _WIN32
-        WIN32_FIND_DATA fd;
+        wchar_t wInput[MAX_PATH];
+        MultiByteToWideChar(CP_UTF8, 0, input, -1, wInput, MAX_PATH);
+
+        WIN32_FIND_DATAW fd;
         HANDLE h;
 
-        h = FindFirstFile(input, &fd);
+        h = FindFirstFileW(wInput, &fd);
 
         if (h == INVALID_HANDLE_VALUE) {
-            char pattern[MAX_PATH];
-            snprintf(pattern, sizeof(pattern), "%s.*", input);
-            h = FindFirstFile(pattern, &fd);
+            wchar_t wPattern[MAX_PATH];
+
+            swprintf(wPattern, MAX_PATH, L"%ls.*", wInput);
+            h = FindFirstFileW(wPattern, &fd);
         }
 
         if (h != INVALID_HANDLE_VALUE) {
             char *lastSlash = strrchr(input, '\\');
             if (!lastSlash) lastSlash = strrchr(input, '/');
 
+            char fileNameUTF8[MAX_PATH];
+            WideCharToMultiByte(CP_UTF8, 0, fd.cFileName, -1, fileNameUTF8, MAX_PATH, NULL, NULL);
+
             if (lastSlash) {
                 size_t dirLen = (lastSlash - input) + 1;
                 char dir[PATH_MAX];
                 strncpy(dir, input, dirLen);
                 dir[dirLen] = '\0';
-                snprintf(output, PATH_MAX, "%s%s", dir, fd.cFileName);
+
+                snprintf(output, PATH_MAX, "%s%s", dir, fileNameUTF8);
+
             } else {
-                snprintf(output, PATH_MAX, "%s", fd.cFileName);
+                snprintf(output, PATH_MAX, "%s", fileNameUTF8);
             }
 
             FindClose(h);

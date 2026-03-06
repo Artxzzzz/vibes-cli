@@ -10,17 +10,22 @@
 #endif
 
 #include "utils/isAudio.h"
+#include "../../helpers/helpers.h"
 
 int getAudio(const char *folderPath, char files[][PATH_MAX], int maxFiles) {
     int count = 0;
-
 #ifdef _WIN32
-    WIN32_FIND_DATA findFileData;
+    WIN32_FIND_DATAW findFileData;
     HANDLE hFind;
-    char searchPath[PATH_MAX];
+    wchar_t wSearchPath[PATH_MAX];
 
-    snprintf(searchPath, sizeof(searchPath), "%s\\*", folderPath);
-    hFind = FindFirstFile(searchPath, &findFileData);
+    wchar_t wFolderPath[PATH_MAX];
+    MultiByteToWideChar(CP_UTF8, 0, folderPath, -1, wFolderPath, PATH_MAX);
+    
+    swprintf(wSearchPath, PATH_MAX, L"%ls\\*", wFolderPath);
+
+    hFind = FindFirstFileW(wSearchPath, &findFileData);
+
     if (hFind == INVALID_HANDLE_VALUE) {
         printf("Error to open the directory: %s\n", folderPath);
         return 0;
@@ -28,17 +33,19 @@ int getAudio(const char *folderPath, char files[][PATH_MAX], int maxFiles) {
 
     do {
         if (!(findFileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) {
-            if (isAudioFile(findFileData.cFileName)) {
-                strncpy(files[count], findFileData.cFileName, PATH_MAX-1);
+            char fileNameUTF8[PATH_MAX];
+            WideCharToMultiByte(CP_UTF8, 0, findFileData.cFileName, -1, fileNameUTF8, PATH_MAX, NULL, NULL);
+
+            if (isAudioFile(fileNameUTF8)) {
+                strncpy(files[count], fileNameUTF8, PATH_MAX-1);
                 files[count][PATH_MAX-1] = '\0';
                 count++;
                 if (count >= maxFiles) break;
             }
         }
-    } while (FindNextFile(hFind, &findFileData) != 0);
+    } while (FindNextFileW(hFind, &findFileData) != 0);
 
     FindClose(hFind);
-
 #else
     DIR *d = opendir(folderPath);
     if (!d) {

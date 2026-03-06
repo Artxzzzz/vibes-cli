@@ -1,3 +1,3 @@
 #include "config.h"
 
-const char *version = "v0.9.7-beta";
+const char *version = "v0.9.8-beta";

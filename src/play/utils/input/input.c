@@ -22,6 +22,25 @@
 
 #endif
 
+void flushInput() {
+    #ifdef _WIN32
+        while (_kbhit()) _getch();
+    #else
+        struct timeval tv = {0, 0};
+        fd_set fds;
+        while (1) {
+            FD_ZERO(&fds);
+            FD_SET(STDIN_FILENO, &fds);
+
+            if (select(1, &fds, NULL, NULL, &tv) > 0) {
+                getchar();
+            } else {
+                break;
+            }
+        }
+    #endif
+}
+
 #define KEYUP    1001
 #define KEYDOWN  1002
 #define KEYLEFT  1003
@@ -59,13 +78,10 @@ void input(Player* p) {
                 ch = ESC;
             }
 
-            if (ch == KEYRIGHT || ch == KEYLEFT) {
-                while(_kbhit()) _getch(); 
-            }
+            flushInput();
         }
 
         #else
-
         struct timeval tv = {0L, 50000L};
         fd_set fds;
         FD_ZERO(&fds);
@@ -75,8 +91,7 @@ void input(Player* p) {
             ch = getchar();
 
             if (ch == 27) {
-
-                struct timeval tv_small = {0L, 50000L};
+                struct timeval tv_small = {0L, 10000L};
                 fd_set fds_small;
                 FD_ZERO(&fds_small);
                 FD_SET(0, &fds_small);
@@ -94,7 +109,10 @@ void input(Player* p) {
                     ch = ESC;
                 }
             }
+
+            flushInput();
         }
+
         #endif
 
         if (ch != -1) {

@@ -28,6 +28,8 @@ int main(int argc, char **argv) {
     setlocale(LC_ALL, "");
 
     #ifdef _WIN32
+    fixArgvWindows(&argc, &argv);
+    
     _setmode(_fileno(stdout), _O_BINARY);
     SetConsoleOutputCP(CP_UTF8);
     SetConsoleCP(CP_UTF8);
@@ -37,7 +39,6 @@ int main(int argc, char **argv) {
     GetConsoleMode(hOut, &dwMode);
     dwMode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
     SetConsoleMode(hOut, dwMode);
-
 
     freopen("NUL", "w", stderr);
     
